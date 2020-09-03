@@ -1,0 +1,21 @@
+Requisitos Essenciais
+	[RF003] Visualização de pedidos
+	[RF006] Cadastro/atualização de pedidos
+	[RF007] Conclusão/cancelamento de pedidos
+	[RF010] Cadastro/atualização de produtos
+	[RF011] Visualização de produtos
+	[RF013] Visualização de clientes
+	[RF014] Cadastro/atualização de clientes
+	[RF016] Geração de PDF do pedido
+
+Requisitos Importantes
+	[RF004] Filtragem de pedidos
+	[RF005] Ordenação de pedidos
+	[RF008] Atualização de estoque a cada pedido
+	[RF009] Cadastro de fabricação de produtos
+	[RF015] Histórico do cliente
+
+Requisitos Desejáveis
+	[RF001] Login na plataforma
+	[RF002] Gerenciamento de usuários
+	[RF012] Sugestão de preço dos produtos
