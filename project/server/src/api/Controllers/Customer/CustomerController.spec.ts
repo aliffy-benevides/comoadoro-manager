@@ -5,6 +5,13 @@ import express, { Express } from 'express';
 import CustomerEntity from "../../Entities/Customers";
 import ICustomerRepository from '../../Repositories/ICustomerRepository';
 import CustomerController from './CustomerController';
+import RepositoryError from '../../Repositories/RepositoryError';
+
+function throwPromiseError(error: any): Promise<any> {
+  return new Promise((_, reject) => {
+    setTimeout(() => reject(error), 1000)
+  })
+}
 
 describe('The CustomerController', () => {
   let app: Express;
@@ -27,10 +34,10 @@ describe('The CustomerController', () => {
   const customersList: CustomerEntity[] = [
     validCustomerWithId, validCustomerWithId, validCustomerWithId
   ]
-  const invalidCustomer = {}
-  const notFoundError = {
-    status: 404
+  const invalidCustomer = {
+    wrongProp: 'XXXX'
   }
+  const notFoundError = new RepositoryError(404, 'Customer was not found');
   const unexpectedError = {
     message: 'Generic Error'
   }
@@ -88,9 +95,7 @@ describe('The CustomerController', () => {
 
     describe('When Repository throw Error', () => {
       test('Should return status 500 and error\'s message', async () => {
-        mockRepository.Create.mockImplementation(() => {
-          throw unexpectedError;
-        })
+        mockRepository.Create.mockImplementation(() => throwPromiseError(unexpectedError));
 
         const res = await request(app)
           .post(url)
@@ -164,29 +169,21 @@ describe('The CustomerController', () => {
 
     describe('When customer is not found', () => {
       test('Should return status 404 and not found message', async () => {
-        mockRepository.Update.mockImplementation(() => {
-          throw notFoundError;
-        })
-        mockRepository.Show.mockImplementation(() => {
-          throw notFoundError;
-        })
+        mockRepository.Show.mockImplementation(() => throwPromiseError(notFoundError));
+        mockRepository.Update.mockImplementation(() => throwPromiseError(notFoundError));
 
         const res = await request(app)
           .put(validUrl)
           .send(validCustomer)
 
-        expect(res.status).toBe(404);
-        expect(res.body).toMatchObject({
-          message: 'Customer was not found'
-        });
+        expect(res.status).toBe(notFoundError.status);
+        expect(res.body).toMatchObject(notFoundError);
       })
     })
 
     describe('When Repository throw Error', () => {
       test('Should return status 500 and error\'s message', async () => {
-        mockRepository.Update.mockImplementation(() => {
-          throw unexpectedError;
-        })
+        mockRepository.Update.mockImplementation(() => throwPromiseError(unexpectedError));
 
         const res = await request(app)
           .put(validUrl)
@@ -233,25 +230,19 @@ describe('The CustomerController', () => {
 
     describe('When customer is not found', () => {
       test('Should return status 404 and not found message', async () => {
-        mockRepository.Show.mockImplementation(() => {
-          throw notFoundError;
-        });
+        mockRepository.Show.mockImplementation(() => throwPromiseError(notFoundError));
 
         const res = await request(app)
           .get(validUrl)
 
-        expect(res.status).toBe(404);
-        expect(res.body).toMatchObject({
-          message: 'Customer was not found'
-        });
+        expect(res.status).toBe(notFoundError.status);
+        expect(res.body).toMatchObject(notFoundError);
       })
     })
 
     describe('When Repository throw Error', () => {
       test('Should return status 500 and error\'s message', async () => {
-        mockRepository.Show.mockImplementation(() => {
-          throw unexpectedError;
-        })
+        mockRepository.Show.mockImplementation(() => throwPromiseError(unexpectedError));
 
         const res = await request(app)
           .get(validUrl)
@@ -282,9 +273,7 @@ describe('The CustomerController', () => {
 
     describe('When Repository throw Error', () => {
       test('Should return status 500 and error\'s message', async () => {
-        mockRepository.List.mockImplementation(() => {
-          throw unexpectedError;
-        })
+        mockRepository.List.mockImplementation(() => throwPromiseError(unexpectedError));
 
         const res = await request(app)
           .get(validUrl)
@@ -327,17 +316,13 @@ describe('The CustomerController', () => {
 
     describe('When customer is not found', () => {
       test('Should return status 404 and not found message', async () => {
-        mockRepository.Show.mockImplementation(() => {
-          throw notFoundError;
-        });
-        mockRepository.Delete.mockImplementation(() => {
-          throw notFoundError;
-        });
+        mockRepository.Show.mockImplementation(() => throwPromiseError(notFoundError));
+        mockRepository.Delete.mockImplementation(() => throwPromiseError(notFoundError));
 
         const res = await request(app)
           .delete(validUrl)
 
-        expect(res.status).toBe(404);
+        expect(res.status).toBe(notFoundError.status);
         expect(res.body).toMatchObject({
           message: 'Customer was not found'
         });
@@ -346,9 +331,7 @@ describe('The CustomerController', () => {
 
     describe('When Repository throw Error', () => {
       test('Should return status 500 and error\'s message', async () => {
-        mockRepository.Delete.mockImplementation(() => {
-          throw unexpectedError;
-        })
+        mockRepository.Delete.mockImplementation(() => throwPromiseError(unexpectedError));
 
         const res = await request(app)
           .delete(validUrl)
