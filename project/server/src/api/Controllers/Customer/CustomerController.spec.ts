@@ -5,7 +5,7 @@ import express, { Express } from 'express';
 import CustomerEntity from "../../Entities/Customers";
 import ICustomerRepository from '../../Repositories/ICustomerRepository';
 import CustomerController from './CustomerController';
-import RepositoryError from '../../Repositories/RepositoryError';
+import RepositoryException from '../../Repositories/RepositoryException';
 
 function throwPromiseError(error: any): Promise<any> {
   return new Promise((_, reject) => {
@@ -27,6 +27,10 @@ describe('The CustomerController', () => {
     observation: 'XXXXXXX',
     phone: '1500000000'
   }
+  const validCustomerWithInvalidAttributes = {
+    ...validCustomer,
+    invalidAttr: 'Invalid'
+  }
   const validCustomerWithId: CustomerEntity = {
     ...validCustomer,
     id: customerId
@@ -37,7 +41,7 @@ describe('The CustomerController', () => {
   const invalidCustomer = {
     wrongProp: 'XXXX'
   }
-  const notFoundError = new RepositoryError(404, 'Customer was not found');
+  const notFoundError = new RepositoryException(404, 'Customer was not found');
   const unexpectedError = {
     message: 'Generic Error'
   }
@@ -59,6 +63,17 @@ describe('The CustomerController', () => {
         const res = await request(app)
           .post(url)
           .send(validCustomer)
+
+        expect(mockRepository.Create).toHaveBeenCalledWith(validCustomer);
+        expect(res.status).toBe(201);
+      })
+    })
+
+    describe('With a valid customer with invalid Attributes', () => {
+      test('Should return status 201 and call repository\'s create function with just valid attributes', async () => {
+        const res = await request(app)
+          .post(url)
+          .send(validCustomerWithInvalidAttributes)
 
         expect(mockRepository.Create).toHaveBeenCalledWith(validCustomer);
         expect(res.status).toBe(201);
@@ -119,6 +134,17 @@ describe('The CustomerController', () => {
         const res = await request(app)
           .put(validUrl)
           .send(validCustomer)
+
+        expect(mockRepository.Update).toHaveBeenCalledWith(validCustomerWithId);
+        expect(res.status).toBe(201);
+      })
+    })
+
+    describe('With a valid customer with invalid attributes', () => {
+      test('Should return status 201 and call repository\'s update function with just valid attributes', async () => {
+        const res = await request(app)
+          .put(validUrl)
+          .send(validCustomerWithInvalidAttributes)
 
         expect(mockRepository.Update).toHaveBeenCalledWith(validCustomerWithId);
         expect(res.status).toBe(201);
@@ -323,9 +349,7 @@ describe('The CustomerController', () => {
           .delete(validUrl)
 
         expect(res.status).toBe(notFoundError.status);
-        expect(res.body).toMatchObject({
-          message: 'Customer was not found'
-        });
+        expect(res.body).toMatchObject(notFoundError);
       })
     })
 
