@@ -1,27 +1,27 @@
 //#region Table Entities
 // Category
 export interface CategoryEntity {
-  id: number;
+  id?: number;
   name: string;
   image_url: string;
-  category_id?: number;
+  category_id?: number | null;
 }
 
 // Feature
 export interface FeatureEntity {
-  id: number;
+  id?: number;
   name: string;
 }
 
 export interface ProductFeaturesEntity {
-  id: number;
+  id?: number;
   product_id: number;
   feature_id: number;
 }
 
 // Packing
 export interface PackingEntity {
-  id: number;
+  id?: number;
   size: number;
   unit_abbreviation: string;
   unit: string;
@@ -30,7 +30,7 @@ export interface PackingEntity {
 }
 
 export interface ProductPackingsEntity {
-  id: number;
+  id?: number;
   product_id: number;
   packing_id: number;
   price: number;
@@ -39,12 +39,12 @@ export interface ProductPackingsEntity {
 
 // Product
 export interface ProductEntity {
-  id: number;
+  id?: number;
   name: string;
   description: string;
   is_packed: boolean;
   unit_cost: number;
-  unit_price?: number;
+  unit_price?: number | null;
   category_id: number;
   is_activated: boolean;
 }

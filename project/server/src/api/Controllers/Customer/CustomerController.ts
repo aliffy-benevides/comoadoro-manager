@@ -27,7 +27,6 @@ export default class CustomerController implements IController {
     this.Router.use('/', this.ErrorHandler);
   }
 
-  // Validation
   private ParseCustomer = (sendedCustomer: CustomerEntity): CustomerEntity => {
     if (!sendedCustomer || Object.keys(sendedCustomer).length === 0)
       throw new ControllerException(400, 'Customer not provided');
