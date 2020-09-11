@@ -4,7 +4,7 @@ import { Express } from 'express';
 
 import IProductRepository from '../../Repositories/IProductRepository';
 import ProductController from './ProductController';
-import { FullProductEntity, CategoryEntity, PackingEntity, FeatureEntity } from '../../Entities/Products';
+import { FullProductEntity, CategoryEntity, PackingEntity, FeatureEntity, ProductPackingsEntity } from '../../Entities/Products';
 
 import { initializeServerWithController, testWhenRepoThrowsError } from '../../../../test/testHelpers';
 
@@ -54,11 +54,53 @@ describe('The ProductController', () => {
     const validEntityWithId: FullProductEntity = {
       ...validEntity,
       id: entityId
-    }
+    };
 
     const entitiesList: FullProductEntity[] = [
       validEntity, validEntity, validEntity
-    ]
+    ];
+
+    const validEntityWithFeaturesWithoutId: FullProductEntity = {
+      ...validEntity,
+      features: [{
+        name: 'Name'
+      }]
+    };
+
+    const validEntityWithPackingsWithoutId: FullProductEntity = {
+      ...validEntity,
+      packings: [{
+        name: 'Name',
+        cost: 5, size: 500, unit: 'gramas', unit_abbreviation: 'g',
+        productPacking: {
+          packing_id: 1, product_id: 1, price: 5.45, quantity: 40
+        }
+      }]
+    };
+
+    const validEntityWithPackingsWithInvalidProductPacking: FullProductEntity = {
+      ...validEntity,
+      packings: [{
+        id: 1,
+        name: 'Name',
+        cost: 5, size: 500, unit: 'gramas', unit_abbreviation: 'g',
+        productPacking: {
+          id: 15, packing_id: 1, product_id: 1, wrongProp: 'Invalid'
+        } as any as ProductPackingsEntity
+      }]
+    };
+
+    const validEntityWithPackingsWithProductPackingDefaultValues: FullProductEntity = {
+      ...validEntity,
+      packings: [{
+        id: 1,
+        name: 'Name',
+        cost: 5, size: 500, unit: 'gramas', unit_abbreviation: 'g',
+        productPacking: {
+          id: 15, packing_id: 1, product_id: 1, price: 0, quantity: 0
+        }
+      }]
+    };
     //#endregion
 
     describe(`POST ${baseUrl} (CREATE)`, () => {
@@ -111,6 +153,47 @@ describe('The ProductController', () => {
           expect(res.body).toMatchObject({
             message: 'Product not provided'
           });
+        })
+      })
+
+      describe('When send a valid product, but with features without id', () => {
+        test('Should return status 400 and do not call repository\'s create function', async () => {
+          const res = await request(app)
+            .post(url)
+            .send(validEntityWithFeaturesWithoutId)
+
+          expect(mockRepository.Create).not.toHaveBeenCalled();
+          expect(res.status).toBe(400);
+          expect(res.body).toMatchObject({
+            message: 'Invalid product',
+            detail: 'Some features\' id was not provided'
+          })
+        })
+      })
+
+      describe('When send a valid product, but with packings without id', () => {
+        test('Should return status 400 and do not call repository\'s create function', async () => {
+          const res = await request(app)
+            .post(url)
+            .send(validEntityWithPackingsWithoutId)
+
+          expect(mockRepository.Create).not.toHaveBeenCalled();
+          expect(res.status).toBe(400);
+          expect(res.body).toMatchObject({
+            message: 'Invalid product',
+            detail: 'Some packings\' id was not provided'
+          })
+        })
+      })
+
+      describe('When send a valid product, but with packings with invalid productPacking', () => {
+        test('Should return status 201 and call repository\'s create function with product packing\' default values', async () => {
+          const res = await request(app)
+            .post(url)
+            .send(validEntityWithPackingsWithInvalidProductPacking)
+
+          expect(res.status).toBe(201);
+          expect(mockRepository.Create).toHaveBeenCalledWith(validEntityWithPackingsWithProductPackingDefaultValues);
         })
       })
 
@@ -192,6 +275,47 @@ describe('The ProductController', () => {
           expect(res.body).toMatchObject({
             message: 'Invalid product\'s id'
           });
+        })
+      })
+
+      describe('When send a valid product, but with features without id', () => {
+        test('Should return status 400 and do not call repository\'s update function', async () => {
+          const res = await request(app)
+            .put(validUrl)
+            .send(validEntityWithFeaturesWithoutId)
+
+          expect(mockRepository.Update).not.toHaveBeenCalled();
+          expect(res.status).toBe(400);
+          expect(res.body).toMatchObject({
+            message: 'Invalid product',
+            detail: 'Some features\' id was not provided'
+          })
+        })
+      })
+
+      describe('When send a valid product, but with packings without id', () => {
+        test('Should return status 400 and do not call repository\'s update function', async () => {
+          const res = await request(app)
+            .put(validUrl)
+            .send(validEntityWithPackingsWithoutId)
+
+          expect(mockRepository.Update).not.toHaveBeenCalled();
+          expect(res.status).toBe(400);
+          expect(res.body).toMatchObject({
+            message: 'Invalid product',
+            detail: 'Some packings\' id was not provided'
+          })
+        })
+      })
+
+      describe('When send a valid product, but with packings with invalid productPacking', () => {
+        test('Should return status 201 and call repository\'s create function with product packing\' default values', async () => {
+          const res = await request(app)
+            .put(validUrl)
+            .send(validEntityWithPackingsWithInvalidProductPacking)
+
+          expect(res.status).toBe(201);
+          expect(mockRepository.Update).toHaveBeenCalledWith({ ...validEntityWithPackingsWithProductPackingDefaultValues, id: entityId });
         })
       })
 
@@ -821,6 +945,10 @@ describe('The ProductController', () => {
       name: 'Name',
       image_url: 'Image'
     };
+    const validEntityVerified: CategoryEntity = {
+      ...validEntity,
+      category_id: null
+    };
 
     const validEntityWithInvalidAttributes = {
       ...validEntity,
@@ -830,11 +958,6 @@ describe('The ProductController', () => {
     const invalidEntity = {
       wrongAttr: 'Invalid'
     };
-
-    const validEntityWithId: CategoryEntity = {
-      ...validEntity,
-      id: entityId
-    }
 
     const entitiesList: CategoryEntity[] = [
       validEntity, validEntity, validEntity
@@ -851,7 +974,7 @@ describe('The ProductController', () => {
             .send(validEntity)
 
           expect(res.status).toBe(201);
-          expect(mockRepository.CreateCategory).toHaveBeenCalledWith(validEntity);
+          expect(mockRepository.CreateCategory).toHaveBeenCalledWith(validEntityVerified);
         })
       })
 
@@ -862,7 +985,7 @@ describe('The ProductController', () => {
             .send(validEntityWithInvalidAttributes)
 
           expect(res.status).toBe(201);
-          expect(mockRepository.CreateCategory).toHaveBeenCalledWith(validEntity);
+          expect(mockRepository.CreateCategory).toHaveBeenCalledWith(validEntityVerified);
         })
       })
 
@@ -918,7 +1041,7 @@ describe('The ProductController', () => {
             .send(validEntity)
 
           expect(res.status).toBe(201);
-          expect(mockRepository.UpdateCategory).toHaveBeenCalledWith(validEntityWithId);
+          expect(mockRepository.UpdateCategory).toHaveBeenCalledWith({ ...validEntityVerified, id: entityId });
         })
       })
 
@@ -929,7 +1052,7 @@ describe('The ProductController', () => {
             .send(validEntityWithInvalidAttributes)
 
           expect(res.status).toBe(201);
-          expect(mockRepository.UpdateCategory).toHaveBeenCalledWith(validEntityWithId);
+          expect(mockRepository.UpdateCategory).toHaveBeenCalledWith({ ...validEntityVerified, id: entityId });
         })
       })
 

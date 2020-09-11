@@ -3,7 +3,7 @@
 export interface CategoryEntity {
   id?: number;
   name: string;
-  image_url: string;
+  image_url: string | null;
   category_id?: number | null;
 }
 
@@ -22,10 +22,10 @@ export interface ProductFeaturesEntity {
 // Packing
 export interface PackingEntity {
   id?: number;
-  size: number;
-  unit_abbreviation: string;
-  unit: string;
   name: string;
+  unit: string | null;
+  unit_abbreviation: string | null;
+  size: number;
   cost: number;
 }
 
