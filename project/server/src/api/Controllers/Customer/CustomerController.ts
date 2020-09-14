@@ -4,8 +4,8 @@ import IController from '../IController';
 import ICustomerRepository from "../../Repositories/ICustomerRepository";
 import CustomerEntity from '../../Entities/Customers';
 
-import ControllerException from '../Errors/ControllerException';
-import ErrorHandler, { ParseError } from '../Errors/ErrorHandler';
+import ControllerException from '../ControllerException';
+import { ParseId, ParseError } from '../utils/utilFunctions';
 
 interface Params {
   customerId: string;
@@ -53,14 +53,6 @@ export default class CustomerController implements IController {
     }
   }
 
-  private ParseCustomerId = (customerId: string): number => {
-    const id = parseInt(customerId);
-    if (isNaN(id))
-      throw new ControllerException(404, 'Invalid customer\'s id');
-
-    return id;
-  }
-
   // Arrow Function bind 'this'
   private Create = async (req: CreateRequest, res: Response, next: NextFunction) => {
     try {
@@ -75,7 +67,7 @@ export default class CustomerController implements IController {
 
   private Update = async (req: UpdateRequest, res: Response, next: NextFunction) => {
     try {
-      const id = this.ParseCustomerId(req.params.customerId);
+      const id = ParseId(req.params.customerId,'Invalid customer\'s id');
       const customer = this.ParseCustomer(req.body);
 
       await this.repo.Update({ ...customer, id });
@@ -87,7 +79,7 @@ export default class CustomerController implements IController {
 
   private Show = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const id = this.ParseCustomerId(req.params.customerId);
+      const id = ParseId(req.params.customerId, 'Invalid customer\'s id');
 
       const customer = await this.repo.Show(id);
       return res.json(customer);
@@ -107,7 +99,7 @@ export default class CustomerController implements IController {
 
   private Delete = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const id = this.ParseCustomerId(req.params.customerId);
+      const id = ParseId(req.params.customerId,'Invalid customer\'s id');
 
       await this.repo.Delete(id);
       return res.status(201).send();

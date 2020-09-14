@@ -4,8 +4,8 @@ import IController from "../IController";
 import IProductRepository from "../../Repositories/IProductRepository";
 import { FullProductEntity, FeatureEntity, PackingEntity, CategoryEntity } from "../../Entities/Products";
 
-import ControllerException from "../Errors/ControllerException";
-import ErrorHandler, { ParseError } from "../Errors/ErrorHandler";
+import ControllerException from "../ControllerException";
+import { ParseId, ParseError } from "../utils/utilFunctions";
 
 interface ProductParams {
   productId: string;
@@ -196,14 +196,6 @@ export default class ProductController implements IController {
     }
   }
 
-  private ParseId = (paramId: string, errorMessage: string): number => {
-    const id = parseInt(paramId);
-    if (isNaN(id))
-      throw new ControllerException(404, errorMessage);
-
-    return id;
-  }
-
   //#region Products CRUD
   private Create = async (req: CreateProductRequest, res: Response, next: NextFunction) => {
     try {
@@ -218,7 +210,7 @@ export default class ProductController implements IController {
 
   private Update = async (req: UpdateProductRequest, res: Response, next: NextFunction) => {
     try {
-      const id = this.ParseId(req.params.productId, 'Invalid product\'s id');
+      const id = ParseId(req.params.productId, 'Invalid product\'s id');
       const product = this.ParseProduct(req.body);
 
       await this.repo.Update({ ...product, id });
@@ -230,7 +222,7 @@ export default class ProductController implements IController {
 
   private Show = async (req: Request<ProductParams>, res: Response, next: NextFunction) => {
     try {
-      const id = this.ParseId(req.params.productId, 'Invalid product\'s id');
+      const id = ParseId(req.params.productId, 'Invalid product\'s id');
 
       const product = await this.repo.Show(id);
       return res.json(product);
@@ -250,7 +242,7 @@ export default class ProductController implements IController {
 
   private Delete = async (req: Request<ProductParams>, res: Response, next: NextFunction) => {
     try {
-      const id = this.ParseId(req.params.productId, 'Invalid product\'s id');
+      const id = ParseId(req.params.productId, 'Invalid product\'s id');
 
       await this.repo.Delete(id);
       return res.status(201).send();
@@ -274,7 +266,7 @@ export default class ProductController implements IController {
 
   private UpdatePacking = async (req: UpdatePackingRequest, res: Response, next: NextFunction) => {
     try {
-      const id = this.ParseId(req.params.packingId, 'Invalid packing\'s id');
+      const id = ParseId(req.params.packingId, 'Invalid packing\'s id');
       const packing = this.ParsePacking(req.body);
 
       await this.repo.UpdatePacking({ ...packing, id });
@@ -295,7 +287,7 @@ export default class ProductController implements IController {
 
   private DeletePacking = async (req: Request<PackingParams>, res: Response, next: NextFunction) => {
     try {
-      const id = this.ParseId(req.params.packingId, 'Invalid packing\'s id');
+      const id = ParseId(req.params.packingId, 'Invalid packing\'s id');
 
       await this.repo.DeletePacking(id);
       return res.status(201).send();
@@ -319,7 +311,7 @@ export default class ProductController implements IController {
 
   private UpdateFeature = async (req: UpdateFeatureRequest, res: Response, next: NextFunction) => {
     try {
-      const id = this.ParseId(req.params.featureId, 'Invalid feature\'s id');
+      const id = ParseId(req.params.featureId, 'Invalid feature\'s id');
       const feature = this.ParseFeature(req.body);
 
       await this.repo.UpdateFeature({ ...feature, id });
@@ -340,7 +332,7 @@ export default class ProductController implements IController {
 
   private DeleteFeature = async (req: Request<FeatureParams>, res: Response, next: NextFunction) => {
     try {
-      const id = this.ParseId(req.params.featureId, 'Invalid feature\'s id');
+      const id = ParseId(req.params.featureId, 'Invalid feature\'s id');
 
       await this.repo.DeleteFeature(id);
       return res.status(201).send();
@@ -364,7 +356,7 @@ export default class ProductController implements IController {
 
   private UpdateCategory = async (req: UpdateCategoryRequest, res: Response, next: NextFunction) => {
     try {
-      const id = this.ParseId(req.params.categoryId, 'Invalid category\'s id');
+      const id = ParseId(req.params.categoryId, 'Invalid category\'s id');
       const category = this.ParseCategory(req.body);
 
       await this.repo.UpdateCategory({ ...category, id });
@@ -385,7 +377,7 @@ export default class ProductController implements IController {
 
   private DeleteCategory = async (req: Request<CategoryParams>, res: Response, next: NextFunction) => {
     try {
-      const id = this.ParseId(req.params.categoryId, 'Invalid category\'s id');
+      const id = ParseId(req.params.categoryId, 'Invalid category\'s id');
 
       await this.repo.DeleteCategory(id);
       return res.status(201).send();

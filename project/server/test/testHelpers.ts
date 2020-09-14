@@ -3,7 +3,7 @@ import request from 'supertest';
 
 import IController from "../src/api/Controllers/IController";
 import ApiException from '../src/api/ApiException';
-import ErrorHandler from '../src/api/Controllers/Errors/ErrorHandler';
+import ErrorHandler from '../src/api/Controllers/ErrorHandler';
 
 const expectedError = new ApiException(400, 'Expected error');
 const unexpectedError = { error: 'Unexpected error' };
