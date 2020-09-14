@@ -3,6 +3,7 @@ import request from 'supertest';
 
 import IController from "../src/api/Controllers/IController";
 import ApiException from '../src/api/ApiException';
+import ErrorHandler from '../src/api/Controllers/Errors/ErrorHandler';
 
 const expectedError = new ApiException(400, 'Expected error');
 const unexpectedError = { error: 'Unexpected error' };
@@ -11,7 +12,10 @@ export function initializeServerWithController(controller: IController) {
   const app = express();
 
   app.use(express.json());
+
   app.use(controller.Path, controller.Router);
+
+  app.use('/', ErrorHandler);
 
   return app;
 }

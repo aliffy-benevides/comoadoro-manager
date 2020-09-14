@@ -1,4 +1,4 @@
-import ApiException from "../ApiException";
+import ApiException from "../../ApiException";
 
 export default class ControllerException extends ApiException {
   detail?: string;

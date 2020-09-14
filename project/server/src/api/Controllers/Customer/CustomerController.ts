@@ -4,8 +4,8 @@ import IController from '../IController';
 import ICustomerRepository from "../../Repositories/ICustomerRepository";
 import CustomerEntity from '../../Entities/Customers';
 
-import ApiException from '../../ApiException';
-import ControllerException from '../ControllerException';
+import ControllerException from '../Errors/ControllerException';
+import ErrorHandler, { ParseError } from '../Errors/ErrorHandler';
 
 interface Params {
   customerId: string;
@@ -24,7 +24,6 @@ export default class CustomerController implements IController {
     this.Router.get('/:customerId', this.Show);
     this.Router.get('/', this.List);
     this.Router.delete('/:customerId', this.Delete);
-    this.Router.use('/', this.ErrorHandler);
   }
 
   private ParseCustomer = (sendedCustomer: CustomerEntity): CustomerEntity => {
@@ -62,17 +61,6 @@ export default class CustomerController implements IController {
     return id;
   }
 
-  private ParseError = (error: any, defaultMessage: string): ApiException => {
-    if (error instanceof ApiException)
-      return error;
-
-    return new ApiException(500, defaultMessage, error);
-  }
-
-  private ErrorHandler = (error: ApiException, req: Request, res: Response, next: NextFunction) => {
-    return res.status(error.status).json(error);
-  }
-
   // Arrow Function bind 'this'
   private Create = async (req: CreateRequest, res: Response, next: NextFunction) => {
     try {
@@ -81,7 +69,7 @@ export default class CustomerController implements IController {
       await this.repo.Create(customer);
       return res.status(201).send();
     } catch (error) {
-      return next(this.ParseError(error, 'Unexpected error on create customer'));
+      return next(ParseError(error, 'Unexpected error on create customer'));
     }
   }
 
@@ -93,7 +81,7 @@ export default class CustomerController implements IController {
       await this.repo.Update({ ...customer, id });
       return res.status(201).send();
     } catch (error) {
-      return next(this.ParseError(error, 'Unexpected error on update customer'));
+      return next(ParseError(error, 'Unexpected error on update customer'));
     }
   }
 
@@ -104,7 +92,7 @@ export default class CustomerController implements IController {
       const customer = await this.repo.Show(id);
       return res.json(customer);
     } catch (error) {
-      return next(this.ParseError(error, 'Unexpected error on show customer'));
+      return next(ParseError(error, 'Unexpected error on show customer'));
     }
   }
 
@@ -113,7 +101,7 @@ export default class CustomerController implements IController {
       const customers = await this.repo.List();
       return res.json(customers);
     } catch (error) {
-      return next(this.ParseError(error, 'Unexpected error on list customers'));
+      return next(ParseError(error, 'Unexpected error on list customers'));
     }
   }
 
@@ -124,7 +112,7 @@ export default class CustomerController implements IController {
       await this.repo.Delete(id);
       return res.status(201).send();
     } catch (error) {
-      return next(this.ParseError(error, 'Unexpected error on delete customer'));
+      return next(ParseError(error, 'Unexpected error on delete customer'));
     }
   }
 }

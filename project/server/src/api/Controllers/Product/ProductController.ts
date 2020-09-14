@@ -4,8 +4,8 @@ import IController from "../IController";
 import IProductRepository from "../../Repositories/IProductRepository";
 import { FullProductEntity, FeatureEntity, PackingEntity, CategoryEntity } from "../../Entities/Products";
 
-import ControllerException from "../ControllerException";
-import ApiException from "../../ApiException";
+import ControllerException from "../Errors/ControllerException";
+import ErrorHandler, { ParseError } from "../Errors/ErrorHandler";
 
 interface ProductParams {
   productId: string;
@@ -36,7 +36,7 @@ export default class ProductController implements IController {
   readonly Router = Router();
 
   constructor(private repo: IProductRepository) {
-    // More specific Routes go first
+    // More specific Routes goes first
     // Packings
     this.Router.post('/packings', this.CreatePacking);
     this.Router.put('/packings/:packingId', this.UpdatePacking);
@@ -61,8 +61,6 @@ export default class ProductController implements IController {
     this.Router.get('/:productId', this.Show);
     this.Router.get('/', this.List);
     this.Router.delete('/:productId', this.Delete);
-
-    this.Router.use('/', this.ErrorHandler);
   }
 
   private ParseProduct = (sendedProduct: FullProductEntity): FullProductEntity => {
@@ -206,17 +204,6 @@ export default class ProductController implements IController {
     return id;
   }
 
-  private ParseError = (error: any, defaultMessage: string): ApiException => {
-    if (error instanceof ApiException)
-      return error;
-
-    return new ApiException(500, defaultMessage, error);
-  }
-
-  private ErrorHandler = (error: ApiException, req: Request, res: Response, next: NextFunction) => {
-    return res.status(error.status).json(error);
-  }
-
   //#region Products CRUD
   private Create = async (req: CreateProductRequest, res: Response, next: NextFunction) => {
     try {
@@ -225,7 +212,7 @@ export default class ProductController implements IController {
       await this.repo.Create(product);
       return res.status(201).send();
     } catch (error) {
-      return next(this.ParseError(error, 'Unexpected error on create product'));
+      return next(ParseError(error, 'Unexpected error on create product'));
     }
   }
 
@@ -237,7 +224,7 @@ export default class ProductController implements IController {
       await this.repo.Update({ ...product, id });
       return res.status(201).send();
     } catch (error) {
-      return next(this.ParseError(error, 'Unexpected error on update product'));
+      return next(ParseError(error, 'Unexpected error on update product'));
     }
   }
 
@@ -248,7 +235,7 @@ export default class ProductController implements IController {
       const product = await this.repo.Show(id);
       return res.json(product);
     } catch (error) {
-      return next(this.ParseError(error, 'Unexpected error on show product'));
+      return next(ParseError(error, 'Unexpected error on show product'));
     }
   }
 
@@ -257,7 +244,7 @@ export default class ProductController implements IController {
       const products = await this.repo.List();
       return res.json(products);
     } catch (error) {
-      return next(this.ParseError(error, 'Unexpected error on list products'));
+      return next(ParseError(error, 'Unexpected error on list products'));
     }
   }
 
@@ -268,7 +255,7 @@ export default class ProductController implements IController {
       await this.repo.Delete(id);
       return res.status(201).send();
     } catch (error) {
-      return next(this.ParseError(error, 'Unexpected error on delete product'));
+      return next(ParseError(error, 'Unexpected error on delete product'));
     }
   }
   //#endregion
@@ -281,7 +268,7 @@ export default class ProductController implements IController {
       await this.repo.CreatePacking(packing);
       return res.status(201).send();
     } catch (error) {
-      return next(this.ParseError(error, 'Unexpected error on create packing'));
+      return next(ParseError(error, 'Unexpected error on create packing'));
     }
   }
 
@@ -293,7 +280,7 @@ export default class ProductController implements IController {
       await this.repo.UpdatePacking({ ...packing, id });
       return res.status(201).send();
     } catch (error) {
-      return next(this.ParseError(error, 'Unexpected error on update packing'));
+      return next(ParseError(error, 'Unexpected error on update packing'));
     }
   }
 
@@ -302,7 +289,7 @@ export default class ProductController implements IController {
       const packings = await this.repo.ListPackings();
       return res.json(packings);
     } catch (error) {
-      return next(this.ParseError(error, 'Unexpected error on list packings'));
+      return next(ParseError(error, 'Unexpected error on list packings'));
     }
   }
 
@@ -313,7 +300,7 @@ export default class ProductController implements IController {
       await this.repo.DeletePacking(id);
       return res.status(201).send();
     } catch (error) {
-      return next(this.ParseError(error, 'Unexpected error on delete packing'));
+      return next(ParseError(error, 'Unexpected error on delete packing'));
     }
   }
   //#endregion
@@ -326,7 +313,7 @@ export default class ProductController implements IController {
       await this.repo.CreateFeature(feature);
       return res.status(201).send();
     } catch (error) {
-      return next(this.ParseError(error, 'Unexpected error on create feature'));
+      return next(ParseError(error, 'Unexpected error on create feature'));
     }
   }
 
@@ -338,7 +325,7 @@ export default class ProductController implements IController {
       await this.repo.UpdateFeature({ ...feature, id });
       return res.status(201).send();
     } catch (error) {
-      return next(this.ParseError(error, 'Unexpected error on update feature'));
+      return next(ParseError(error, 'Unexpected error on update feature'));
     }
   }
 
@@ -347,7 +334,7 @@ export default class ProductController implements IController {
       const features = await this.repo.ListFeatures();
       return res.json(features);
     } catch (error) {
-      return next(this.ParseError(error, 'Unexpected error on list features'));
+      return next(ParseError(error, 'Unexpected error on list features'));
     }
   }
 
@@ -358,7 +345,7 @@ export default class ProductController implements IController {
       await this.repo.DeleteFeature(id);
       return res.status(201).send();
     } catch (error) {
-      return next(this.ParseError(error, 'Unexpected error on delete feature'));
+      return next(ParseError(error, 'Unexpected error on delete feature'));
     }
   }
   //#endregion
@@ -371,7 +358,7 @@ export default class ProductController implements IController {
       await this.repo.CreateCategory(category);
       return res.status(201).send();
     } catch (error) {
-      return next(this.ParseError(error, 'Unexpected error on create category'));
+      return next(ParseError(error, 'Unexpected error on create category'));
     }
   }
 
@@ -383,7 +370,7 @@ export default class ProductController implements IController {
       await this.repo.UpdateCategory({ ...category, id });
       return res.status(201).send();
     } catch (error) {
-      return next(this.ParseError(error, 'Unexpected error on update category'));
+      return next(ParseError(error, 'Unexpected error on update category'));
     }
   }
 
@@ -392,7 +379,7 @@ export default class ProductController implements IController {
       const categories = await this.repo.ListCategories();
       return res.json(categories);
     } catch (error) {
-      return next(this.ParseError(error, 'Unexpected error on list categories'));
+      return next(ParseError(error, 'Unexpected error on list categories'));
     }
   }
 
@@ -403,7 +390,7 @@ export default class ProductController implements IController {
       await this.repo.DeleteCategory(id);
       return res.status(201).send();
     } catch (error) {
-      return next(this.ParseError(error, 'Unexpected error on delete category'));
+      return next(ParseError(error, 'Unexpected error on delete category'));
     }
   }
   //#endregion
