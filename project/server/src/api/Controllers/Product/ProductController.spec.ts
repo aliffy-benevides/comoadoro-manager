@@ -418,7 +418,7 @@ describe('The ProductController', () => {
       })
 
       describe('When send with a invalid product\'s id', () => {
-        test('Should return status 404 and do not call repository\'s show function', async () => {
+        test('Should return status 404 and do not call repository\'s delete function', async () => {
           const res = await request(app)
             .delete(invalidUrl)
 
@@ -666,7 +666,7 @@ describe('The ProductController', () => {
       })
 
       describe('When send with a invalid packing\'s id', () => {
-        test('Should return status 404 and do not call repository\'s show function', async () => {
+        test('Should return status 404 and do not call repository\'s delete function', async () => {
           const res = await request(app)
             .delete(invalidUrl)
 
@@ -910,7 +910,7 @@ describe('The ProductController', () => {
       })
 
       describe('When send with a invalid feature\'s id', () => {
-        test('Should return status 404 and do not call repository\'s show function', async () => {
+        test('Should return status 404 and do not call repository\'s delete function', async () => {
           const res = await request(app)
             .delete(invalidUrl)
 
@@ -1154,7 +1154,7 @@ describe('The ProductController', () => {
       })
 
       describe('When send with a invalid category\'s id', () => {
-        test('Should return status 404 and do not call repository\'s show function', async () => {
+        test('Should return status 404 and do not call repository\'s delete function', async () => {
           const res = await request(app)
             .delete(invalidUrl)
 

@@ -9,23 +9,23 @@ type OrderStatusEnum =
 
 //#region Table Entities
 export interface OrderItemEntity {
-  id: number;
-  order_id: number;
+  id?: number;
+  order_id?: number;
   product_id: number;
-  packing_id: number;
+  packing_id: number | null;
   amount: number;
   unit_price: number;
 }
 
 export interface OrderEntity {
-  id: number;
+  id?: number;
   customer_id: number;
   order_date: Date;
   delivery_date: Date;
   status: OrderStatusEnum;
   discount: number;
   shipping: number;
-  observation: string;
+  observation?: string | null;
 }
 //#endregion
 
