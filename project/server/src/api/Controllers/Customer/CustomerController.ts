@@ -67,7 +67,7 @@ export default class CustomerController implements IController {
 
   private Update = async (req: UpdateRequest, res: Response, next: NextFunction) => {
     try {
-      const id = ParseId(req.params.customerId,'Invalid customer\'s id');
+      const id = ParseId(req.params.customerId, 'Invalid customer\'s id');
       const customer = this.ParseCustomer(req.body);
 
       await this.repo.Update({ ...customer, id });

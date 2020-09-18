@@ -2,7 +2,7 @@ import { ProductEntity, PackingEntity } from "./Products";
 import CustomerEntity from "./Customers";
 
 // Enums
-type OrderStatusEnum =
+export type OrderStatusEnum =
   'Registered' |
   'Finished' |
   'Canceled';
@@ -14,14 +14,14 @@ export interface OrderItemEntity {
   product_id: number;
   packing_id: number | null;
   amount: number;
-  unit_price: number;
+  unit_price?: number;
 }
 
 export interface OrderEntity {
   id?: number;
   customer_id: number;
-  order_date: Date;
-  delivery_date: Date;
+  order_date: string;
+  delivery_date: string;
   status: OrderStatusEnum;
   discount: number;
   shipping: number;
@@ -30,13 +30,13 @@ export interface OrderEntity {
 //#endregion
 
 //#region Auxiliares Entities
-interface FullOrderItemEntity extends OrderItemEntity {
-  product: ProductEntity;
-  packing: PackingEntity;
+export interface FullOrderItemEntity extends OrderItemEntity {
+  product?: ProductEntity;
+  packing?: PackingEntity;
 }
 
 export interface FullOrderEntity extends OrderEntity {
   items: FullOrderItemEntity[];
-  customer: CustomerEntity;
+  customer?: CustomerEntity;
 }
 //#endregion
