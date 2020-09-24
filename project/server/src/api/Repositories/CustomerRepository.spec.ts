@@ -144,9 +144,7 @@ describe('CustomerRepository', () => {
 
         describe('and it is a not found customer', () => {
           test('Should throws a not found exception', async () => {
-            const { customer1 } = await initDatabaseWithCustomers(true);
-
-            expect(testRepo.repo.Show(customer1.id as number))
+            expect(testRepo.repo.Show(1))
               .rejects
               .toEqual(new RepositoryException(400, 'Customer was not found'));
           })
@@ -169,9 +167,7 @@ describe('CustomerRepository', () => {
 
         describe('and it is a not found customer', () => {
           test('Should throws a not found exception', async () => {
-            const { customer1 } = await initDatabaseWithCustomers(true);
-
-            expect(testRepo.repo.Delete(customer1.id as number))
+            expect(testRepo.repo.Delete(1))
               .rejects
               .toEqual(new RepositoryException(400, 'Customer was not found'));
           })
